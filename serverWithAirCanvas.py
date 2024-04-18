@@ -1,4 +1,4 @@
-# All the imports go here
+# aerver with air canvas 
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -27,23 +27,27 @@ colorIndex = 0
 
 # Here is code for Canvas setup
 paintWindow = np.zeros((471, 636, 3)) + 255
-paintWindow = cv2.rectangle(paintWindow, (40, 1), (140, 65), (0, 0, 0), 2)
-paintWindow = cv2.rectangle(paintWindow, (160, 1), (255, 65), (255, 0, 0), 2)
-paintWindow = cv2.rectangle(paintWindow, (275, 1), (370, 65), (0, 255, 0), 2)
-paintWindow = cv2.rectangle(paintWindow, (390, 1), (485, 65), (0, 0, 255), 2)
-paintWindow = cv2.rectangle(paintWindow, (505, 1), (600, 65), (0, 255, 255), 2)
-
-cv2.putText(paintWindow, "CLEAR", (49, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-cv2.putText(paintWindow, "BLUE", (185, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-cv2.putText(paintWindow, "GREEN", (298, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-cv2.putText(paintWindow, "RED", (420, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-cv2.putText(paintWindow, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
 cv2.namedWindow('Paint', cv2.WINDOW_AUTOSIZE)
 
 # initialize mediapipe
 mpHands = mp.solutions.hands
 hands = mpHands.Hands(max_num_hands=1, min_detection_confidence=0.7)
 mpDraw = mp.solutions.drawing_utils
+
+# Function to draw rectangles and put text on both paintWindow and frame
+def draw_buttons(window):
+    window = cv2.rectangle(window, (40, 1), (140, 65), (0, 0, 0), 2)
+    window = cv2.rectangle(window, (160, 1), (255, 65), (255, 0, 0), 2)
+    window = cv2.rectangle(window, (275, 1), (370, 65), (0, 255, 0), 2)
+    window = cv2.rectangle(window, (390, 1), (485, 65), (0, 0, 255), 2)
+    window = cv2.rectangle(window, (505, 1), (600, 65), (0, 255, 255), 2)
+    cv2.putText(window, "CLEAR", (49, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+    cv2.putText(window, "BLUE", (185, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+    cv2.putText(window, "GREEN", (298, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+    cv2.putText(window, "RED", (420, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+    cv2.putText(window, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+
+draw_buttons(paintWindow)
 
 # Function to get the local IP address
 def get_ip_address():
@@ -81,39 +85,26 @@ while True:
 
         # Flip the frame vertically
         frame = cv2.flip(frame, 1)
+
+        frame_copy = frame.copy()
         framergb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        frame = cv2.rectangle(frame, (40, 1), (140, 65), (0, 0, 0), 2)
-        frame = cv2.rectangle(frame, (160, 1), (255, 65), (255, 0, 0), 2)
-        frame = cv2.rectangle(frame, (275, 1), (370, 65), (0, 255, 0), 2)
-        frame = cv2.rectangle(frame, (390, 1), (485, 65), (0, 0, 255), 2)
-        frame = cv2.rectangle(frame, (505, 1), (600, 65), (0, 255, 255), 2)
-        cv2.putText(frame, "CLEAR", (49, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-        cv2.putText(frame, "BLUE", (185, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-        cv2.putText(frame, "GREEN", (298, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-        cv2.putText(frame, "RED", (420, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-        cv2.putText(frame, "YELLOW", (520, 33), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+        draw_buttons(frame)
 
         # Get hand landmark prediction
         result = hands.process(framergb)
 
         # post process the result
         if result.multi_hand_landmarks:
-            landmarks = []
+            landmarks = [[int(lm.x * 640), int(lm.y * 480)] for handslms in result.multi_hand_landmarks for lm in handslms.landmark]
+
             for handslms in result.multi_hand_landmarks:
-                for lm in handslms.landmark:
-                    lmx = int(lm.x * 640)
-                    lmy = int(lm.y * 480)
-
-                    landmarks.append([lmx, lmy])
-
                 # Drawing landmarks on frames
                 mpDraw.draw_landmarks(frame, handslms, mpHands.HAND_CONNECTIONS)
             fore_finger = (landmarks[8][0], landmarks[8][1])
             center = fore_finger
             thumb = (landmarks[4][0], landmarks[4][1])
             cv2.circle(frame, center, 3, (0, 255, 0), -1)
-            print(center[1] - thumb[1])
             if (thumb[1] - center[1] < 30):
                 bpoints.append(deque(maxlen=512))
                 blue_index += 1
@@ -153,7 +144,6 @@ while True:
                     rpoints[red_index].appendleft(center)
                 elif colorIndex == 3:
                     ypoints[yellow_index].appendleft(center)
-        # Append the next deques when nothing is detected to avoid messing up
         else:
             bpoints.append(deque(maxlen=512))
             blue_index += 1
@@ -172,15 +162,15 @@ while True:
                     if points[i][j][k - 1] is None or points[i][j][k] is None:
                         continue
                     cv2.line(frame, points[i][j][k - 1], points[i][j][k], colors[i], 2)
-                    cv2.line(paintWindow, points[i][j][k - 1], points[i][j][k], colors[i], 2)
+                    #cv2.line(paintWindow, points[i][j][k - 1], points[i][j][k], colors[i], 2)
 
         # Serialize the paintWindow and send it to the client
-        paint_data = pickle.dumps(paintWindow)
+        paint_data = pickle.dumps(frame)
         message = struct.pack("Q", len(paint_data)) + paint_data
         client.sendall(message)
 
         cv2.imshow("Output", frame)
-        cv2.imshow("Paint", paintWindow)
+        #cv2.imshow("Paint", paintWindow)
 
         key = cv2.waitKey(1) & 0xff
         if key == ord('q'):
