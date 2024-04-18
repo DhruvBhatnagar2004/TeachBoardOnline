@@ -32,7 +32,7 @@ python -m pip install mediapipe --user
 
 1. We have to connect with the same network.
 2. We have to connect through IP address.
-3. Currently, the audio and video streams are running separately (but it works).
+3. Currently, the audio and video streams are running separately i.e not in sync (but it works).
 4. There is no proper UI; we are working on the UI.
 
 
