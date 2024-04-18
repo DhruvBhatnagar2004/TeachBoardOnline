@@ -27,6 +27,14 @@ pip install mediapipe
 python -m pip install mediapipe --user
 
 ```
+# How to Run
+
+1. Run `serverwithAirCanvas.py` in the server system (laptop).
+2. Run `audioServer.py` in the server system (laptop for audio).
+3. Run `client.py` in the client system (different laptop).
+   - Enter the Server IP address (you will get this while running `serverwithAirCanvas.py`).
+4. Run `clientAudio.py` in the server system (laptop for audio).
+   - Enter the Server IP address (you will get this while running `serverwithAirCanvas.py`).
 
 ## Known Issues
 
