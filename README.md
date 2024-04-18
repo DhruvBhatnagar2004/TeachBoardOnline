@@ -36,6 +36,13 @@ python -m pip install mediapipe --user
 4. Run `clientAudio.py` in the server system (laptop for audio).
    - Enter the Server IP address (you will get this while running `serverwithAirCanvas.py`).
 
+## Screenshots
+
+![Detecting Hand](https://github.com/SatyamDevv/TeachBoardOnline/blob/main/screenshots/abc.jpg)
+
+![UI(Working)](https://github.com/SatyamDevv/TeachBoardOnline/blob/main/screenshots/ui.png)
+
+
 ## Known Issues
 
 1. We have to connect with the same network.
